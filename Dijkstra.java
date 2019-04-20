@@ -1,5 +1,5 @@
 class Dijkstra{ //referenced to p305 algorithms
-    private int INF =1<<20;
+    private int INF = Integer.MAX_VALUE;
     private int w=0;
     private int g=1;
     private int b=2;
@@ -46,6 +46,7 @@ class Dijkstra{ //referenced to p305 algorithms
 		}
 	    }
 	}
+	if(d[ed]==INF)return -1.0;
 	return d[ed];
     }
 }
