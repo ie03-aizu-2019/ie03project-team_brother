@@ -22,4 +22,14 @@ class Point{
     public int getID(){
 	return id;
     }
+
+    public void add(Point pt){
+	this.x += pt.getX();
+	this.y += pt.getY();
+    }
+
+    public void sub(Point pt){
+	this.x -= pt.getX();
+	this.y -= pt.getY();
+    }
 }
