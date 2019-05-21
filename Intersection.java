@@ -17,7 +17,7 @@ class Intersection{
 	    + (q2.getX() - p2.getX())*(q1.getY() - p1.getY());
 
 	// step1
-	if(EPS<=det && det<=EPS);
+	if(-EPS<=det && det<=EPS);
 
 	else{
 	    // step2

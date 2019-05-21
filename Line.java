@@ -51,9 +51,9 @@ class Line{
 	double EPS = 0.00000001;
 
 	for(int i=0; i<point.size(); i++){
-	    if(EPS <= point.get(i).getX()-p.getX() &&
+	    if(-EPS <= point.get(i).getX()-p.getX() &&
 	       point.get(i).getX()-p.getX() <= EPS){
-		if(EPS <= point.get(i).getY()-p.getY() &&
+		if(-EPS <= point.get(i).getY()-p.getY() &&
 		   point.get(i).getY()-p.getY() <= EPS){
 		    point.get(i).setID(p.getID());
 		    return;
