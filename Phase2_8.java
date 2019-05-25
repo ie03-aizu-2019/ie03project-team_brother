@@ -144,6 +144,7 @@ class Phase2_8{
 	int inflag;
 	
 	for(int i=1; i<=M-1; i++){
+	    // intersection point
 	    for(int j=i+1; j<=M; j++){
 		
 		// calc the intersection
@@ -161,8 +162,11 @@ class Phase2_8{
 		    Ip.add(ans);
 		}
 	    }
-	    
+
+	    // connecting point
 	    for(int j=1; j<N; j++){
+
+		// if point already registered on line, then ignore.
 		inflag = 0;
 		for(int k=0; k<l[i].getSize(); k++){
 		    isin = dist.pTop(l[i].getList(k),p[j]);
@@ -174,7 +178,8 @@ class Phase2_8{
 		
 		if(inflag==1)
 		    continue;
-		
+
+		// judgement whether point exist on line segment
 		isin = dist.pTop(l[i].getStart(),p[j])
 		    +  dist.pTop(p[j],l[i].getEnd())
 		    -  dist.pTop(l[i].getStart(),l[i].getEnd());
@@ -191,8 +196,8 @@ class Phase2_8{
 	graph = new double[N + IpArray.length][N + IpArray.length];
 	
 	// graph initialize(all weights set 0)
-	for(int i=1; i<l.length; i++){
-	    for(int j=0; j<l[i].getSize()-1; j++){
+	for(int i=0; i<graph.length; i++){
+	    for(int j=0; j<graph[i].length; j++){
 		graph[i][j] = 0;
 	    }
 	}
@@ -267,115 +272,47 @@ class Phase2_8{
 	    }
 	}
 
-	System.out.println((float)s_orth.getX()+" "+(float)s_orth.getY());
+	//System.out.println((float)s_orth.getX()+" "+(float)s_orth.getY());
     }
 
     public static void getHighways(){
-	ArrayList<Area> areas = new ArrayList<Area>();
-	Stack<Integer> stack;
-	int start, end;
-	int had;
-	int connect[] = new int[graph.length];
-	int connect_backup[] = new int[graph.length];
-	int lastArea=0;
-	int visited[] = new int[graph.length];
-	
-	// add Area(which has only 1 connection)
+	double g_back;
+	ArrayList<Integer> S_highways = new ArrayList<Integer>();
+	ArrayList<Integer> E_highways = new ArrayList<Integer>();
+
 	for(int i=1; i<graph.length; i++){
-	    connect[i] = 0;
-	    for(int j=0; j<graph[i].length; j++){
+	    for(int j=i; j<graph[i].length; j++){
+		if(i==j)
+		    continue;
+		
 		if(graph[i][j]>0){
-		    connect[i]++;
-		}
+		    g_back = graph[i][j];
+		    graph[i][j] = 0;
 
-		connect_backup[i] = connect[i];
-	    }
-	    
-	    System.out.println(i +" "+connect[i]);
-	    
-	    if(connect[i]==1){
-		areas.add(new Area());
-		areas.get(lastArea).set(i);
-		lastArea++;
-		continue;
-	    }
-	}
-	
-	// search Area(which has many connections)
-	for(start=1; start<graph.length; start++){
-	    had = 0;
-
-	    // Is value of start included in any areas?
-	    for(int i=0; i<areas.size(); i++){
-		if(areas.get(i).contains(start)){
-		    had = 1;
-		    break;
-		}
-	    }
-
-	    // If included, then skip
-	    if(had == 1)
-		continue;
-
-	    // Initialize visited condition
-	    for(int i=0; i<visited.length; i++){
-		visited[i] = 0;
-	    }
-
-	    for(int i=0; i<connect.length; i++){
-		connect[i] = connect_backup[i];
-	    }
-
-	    // Advanced of depth first search
-	    stack = new Stack<Integer>();
-	    stack.push(start);
-	    //visited[start] = 1;
-	    end = start;
-
-	    while(!(stack.peek()==start && stack.size()!=1)){
-		for(int j=1; j<graph[end].length; j++){
-		    // connection
-		    if(graph[end][j]>0){
-			
-			// has not visited
-			if(visited[j-1] == 0){
-			    visited[j-1] = 1;
-			    stack.push(j);
-			    end = j;
-			    System.out.println(stack.toString());
-			    break;
-			}
-
-			// has visited
-			else{
-			    connect[end]--;
-			}
-		    }
-
-		    // no destination
-		    if(connect[end]==0){
-			stack.pop();
-			System.out.println(stack.toString());
-			break;
+		    if(dijk.nTon(graph, i, j, graph.length-1, N)<=0){
+			S_highways.add(i);
+			E_highways.add(j);
 		    }
 		    
+		    graph[i][j] = g_back;
 		}
+	    }
+	}
 
-		if(stack.empty())
-		    break;
+	for(int i=0; i<S_highways.size(); i++){
+	    if(S_highways.get(i)>N){
+		System.out.printf("C%d ", S_highways.get(i) - N);
 	    }
-	}
-	
-	// print(for debug)
-	for(int i=0; i<areas.size(); i++){
-	    areas.get(i).print();
-	}
-	
-	for(int i=1; i<graph.length; i++){
-	    for(int j=1; j<graph[i].length; j++){
-		System.out.printf("%.2f ",graph[i][j]);
+	    else{
+		System.out.printf("%d ", S_highways.get(i));
 	    }
-	    System.out.println();
+
+	    if(E_highways.get(i)>N){
+		System.out.printf("C%d\n", E_highways.get(i) - N);
+	    }
+	    else{
+		System.out.printf("%d\n", E_highways.get(i));
+	    }
 	}
     }
 }
