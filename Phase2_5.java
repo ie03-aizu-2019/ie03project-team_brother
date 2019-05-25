@@ -8,6 +8,8 @@ class Phase2_5{
 	Sort sort = new Sort();
 	Distance dist = new Distance();
 	Dijkstra dijk = new Dijkstra();
+	int inflag;
+	double isin;
 	double EPS = 0.00000001;
 	
 	Point[] PArray, IArray;   // Array of Intersection Point
@@ -56,8 +58,29 @@ class Phase2_5{
 
 		PArray[par_num++] = ans;
 	    }
+	
+	    for(int j=1; j<N; j++){
+		inflag = 0;
+		for(int k=0; k<l[i].getSize(); k++){
+		    isin = dist.pTop(l[i].getList(k),p[j]);
+		    if(-EPS<=isin && isin<=EPS){
+			inflag = 1;
+			break;
+		    }
+		}
+		
+		if(inflag==1)
+		    continue;
+		
+		isin = dist.pTop(l[i].getStart(),p[j])
+		    +  dist.pTop(p[j],l[i].getEnd())
+		    -  dist.pTop(l[i].getStart(),l[i].getEnd());
+		
+		if(-EPS<=isin && isin<=EPS){
+		    l[i].insert(p[j]);
+		}
+	    }
 	}
-
 	IArray = new Point[iar_num+1];
 	iar_num = 1;     // 1 origin
 	
@@ -103,6 +126,7 @@ class Phase2_5{
 		    = dist.pTop(l[i].getList(j+1), l[i].getList(j));
 	    }
 	}
+	
 	
 	// graph output
 	/*	
@@ -156,8 +180,8 @@ class Phase2_5{
 		for(int z=1;z<dijk_ans.length;z++){
 		if(dijk_ans[z]>0){
 		    System.out.printf("%.5f\n",dijk_ans[z]);
-    //		    System.out.println(dijk.retRoute());   Phase1_4
-    //		    System.out.println(dijk.retRouteS(z)); Phase2_6
+    //		    System.out.println(dijk.retRoute());   //Phase1_4
+    //		    System.out.println(dijk.retRouteS(z)); //Phase2_6
 
 		}else if(z==1){
        		    System.out.println("NA");
