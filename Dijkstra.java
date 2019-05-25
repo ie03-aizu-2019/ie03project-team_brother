@@ -53,9 +53,9 @@ class Dijkstra{ //referenced to p305 algorithms
 			System.out.println("");
 			}*/
 		hz=nTon(n,st,ed,size,psize);
-	        System.out.println("hz = "+hz);
+     //	        System.out.println("hz = "+hz);
 		if(hz==-1.0)return ret;
-		//	      		ret[i]=hz;
+
                 a.add(new Hasroute(d[ed],Route(ed),d,psize));
 		//   System.out.println(Arrays.toString(Route(ed)));
 		delroute(a.get(a.size()-1));/////
@@ -97,7 +97,7 @@ class Dijkstra{ //referenced to p305 algorithms
 		}
 		if(b.size()==0){
 		    Collections.sort(a);//辞書順に小さい文字を優先させるため
-		    System.out.println(a.size());
+		    //		    System.out.println(a.size());
 		    for(int x=1;x<=a.size();x++){
 			ret[x]=a.get(x-1).getdis();
 		    }
