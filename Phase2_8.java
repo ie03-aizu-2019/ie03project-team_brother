@@ -140,6 +140,9 @@ class Phase2_8{
 
     public static void calcIntersection(){
 	Point ans;
+	double isin;
+	int inflag;
+	
 	for(int i=1; i<=M-1; i++){
 	    for(int j=i+1; j<=M; j++){
 		
@@ -156,6 +159,28 @@ class Phase2_8{
 		    l[i].insert(ans);
 		    l[j].insert(ans);
 		    Ip.add(ans);
+		}
+	    }
+	    
+	    for(int j=1; j<N; j++){
+		inflag = 0;
+		for(int k=0; k<l[i].getSize(); k++){
+		    isin = dist.pTop(l[i].getList(k),p[j]);
+		    if(-EPS<=isin && isin<=EPS){
+			inflag = 1;
+			break;
+		    }
+		}
+		
+		if(inflag==1)
+		    continue;
+		
+		isin = dist.pTop(l[i].getStart(),p[j])
+		    +  dist.pTop(p[j],l[i].getEnd())
+		    -  dist.pTop(l[i].getStart(),l[i].getEnd());
+		
+		if(-EPS<=isin && isin<=EPS){
+		    l[i].insert(p[j]);
 		}
 	    }
 	}
