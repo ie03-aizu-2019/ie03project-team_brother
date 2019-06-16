@@ -34,7 +34,9 @@ class Phase1_3{
 	for(int i=1;i<=M;i++){
 	    l[i]=new Line(p[sc.nextInt()],p[sc.nextInt()]);
 	}
-	
+
+	int inflag = 0;
+	double isin;
 	par_num=1;     // 1 origin
 	for(int i=1; i<=M-1; i++){
 	    for(int j=i+1; j<=M; j++){
@@ -53,9 +55,35 @@ class Phase1_3{
 		    l[j].insert(ans);
 		    iar_num++;
 		}
-
+		
 		PArray[par_num++] = ans;
 	    }
+	    
+	    for(int j=1; j<N; j++){
+
+		// if point already registered on line, then ignore.
+		inflag = 0;
+		for(int k=0; k<l[i].getSize(); k++){
+		    isin = dist.pTop(l[i].getList(k),p[j]);
+		    if(-EPS<=isin && isin<=EPS){
+			inflag = 1;
+			break;
+		    }
+		}
+		
+		if(inflag==1)
+		    continue;
+
+		// judgement whether point exist on line segment
+		isin = dist.pTop(l[i].getStart(),p[j])
+		    +  dist.pTop(p[j],l[i].getEnd())
+		    -  dist.pTop(l[i].getStart(),l[i].getEnd());
+		
+		if(-EPS<=isin && isin<=EPS){
+		    l[i].insert(p[j]);
+		}
+	    }
+	    
 	}
 
 	IArray = new Point[iar_num+1];
@@ -105,14 +133,14 @@ class Phase1_3{
 	}
 
 	// graph output
-	/*
+	
 	for(int i=1; i<graph.length; i++){
 	    for(int j=1; j<graph[i].length; j++){
 		System.out.printf("%.2f  ",graph[i][j]);
 	    }
 	    System.out.println();
 	}
-	*/
+	
 
 	// input data
 	String s, d;
@@ -152,7 +180,7 @@ class Phase1_3{
 		System.out.println("NA");
 	    
 	    else{
-		dijk_ans = dijk.nTon(graph, sint, dint, graph.length-1);
+		dijk_ans = dijk.nTon(graph, sint, dint, graph.length-1, N);
 
 		if(dijk_ans>0)
 		    System.out.printf("%.5f\n",dijk_ans);
