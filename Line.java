@@ -3,6 +3,7 @@ import java.util.ArrayList;
 class Line{
     private Point start, end;
     private ArrayList<Point> point = new ArrayList<Point>();
+    private int updown = 0;
 
     Line(Point st, Point ed){
 	this.start = st;
@@ -10,10 +11,20 @@ class Line{
 	
 	point.add(this.start);
 	point.add(this.end);
+
+	if(this.start.getX() < this.end.getX());
 	
-	if(this.start.getX() > this.end.getX()){
+	else if(this.start.getX() > this.end.getX()){
 	    point.remove(this.start);
 	    point.add(this.start);
+	}
+
+	else if(this.start.getY() > this.end.getY()){
+	    updown = -1;
+	}
+
+	else if(this.start.getY() < this.end.getY()){
+	    updown = 1;
 	}
     }
 
@@ -31,6 +42,26 @@ class Line{
 	       && (point.get(i+1).getX() > p.getX())){
 		point.add(i+1,p);
 		break;
+	    }
+	}
+	
+	for(int i=0; i<point.size()-1; i++){
+	    // down
+	    if(updown==-1){
+		if((point.get(i).getY() > p.getY())
+		   && (point.get(i+1).getY() < p.getY())){
+		    point.add(i+1,p);
+		    break;
+		}
+	    }
+	    
+	    // up
+	    else if(updown==1){
+		if((point.get(i).getY() < p.getY())
+		   && (point.get(i+1).getY() > p.getY())){
+		    point.add(i+1,p);
+		    break;
+		}
 	    }
 	}
     }

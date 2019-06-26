@@ -25,11 +25,12 @@ class Intersection{
 		  +(q2.getX() - p2.getX())*(p2.getY() - p1.getY()) )/det;
 	    
 	    t = (  (p1.getY() - q1.getY())*(p2.getX() - p1.getX())
-		  +(q1.getX() - p2.getX())*(p2.getY() - p1.getY()) )/det;
-
+		  +(q1.getX() - p1.getX())*(p2.getY() - p1.getY()) )/det;
+	    
 	    // step3
 	    if((0<s && s<1) && (0<t && t<1)){
-
+		
+		
 		// step4
 		x = p1.getX() + s*(q1.getX() - p1.getX());
 		y = p1.getY() + s*(q1.getY() - p1.getY());
