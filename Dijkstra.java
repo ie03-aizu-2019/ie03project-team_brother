@@ -20,7 +20,6 @@ class Dijkstra{ //referenced to p305 algorithms
     Dijkstra(){
     }
     double[] nTimesnTon(double[][]n,int st,int ed,int size,int psize,int times){
-  	//System.out.println("n[4][9]= "+n[4][9]);	// n[4][9]should = 1!
 	this.size=size;
 	double[]ret=new double[times+1];
 	Hasroute spurroute,test;
@@ -34,7 +33,6 @@ class Dijkstra{ //referenced to p305 algorithms
 	myclone(n,n2);
 	double[][]n3=new double[size+1][size+1];
 	myclone(n,n3);
-	//	System.out.println("n3[9][4]= "+n3[9][4]);
 	int p,p2,bcnt=0;
         a=new ArrayList<Hasroute>();//確定 0origin
 	ArrayList<Hasroute>b=new ArrayList<Hasroute>();//不確定 0origin
@@ -53,7 +51,6 @@ class Dijkstra{ //referenced to p305 algorithms
 			System.out.println("");
 			}*/
 		hz=nTon(n,st,ed,size,psize);
-     //	        System.out.println("hz = "+hz);
 		if(hz==-1.0)return ret;
 
                 a.add(new Hasroute(d[ed],Route(ed),d,psize));
@@ -146,7 +143,6 @@ class Dijkstra{ //referenced to p305 algorithms
 	    }
 	    if(flg ==false){
 	      delind.add(delr);
-	      //	      System.out.println("I add +"+Arrays.toString(delr.getroute()));
 	    }
 	}
 	return;
@@ -172,7 +168,6 @@ class Dijkstra{ //referenced to p305 algorithms
 		}
 	    }
 	}
-	//	ihas=new Hasroute
 	d[st]=0;
 	p[st]=-1;
      
@@ -195,7 +190,6 @@ class Dijkstra{ //referenced to p305 algorithms
 			p[v]=u;
 			color[v]=g;
 		    }
-		    //		    if(d[v]=d[u]+n[u][v]){}
 		}
 	    }
 	}
@@ -218,7 +212,6 @@ class Dijkstra{ //referenced to p305 algorithms
 	    u=-1;
 	    for(int i=1;i<=size;i++){
 		if(color[i]!=b && d[i]<mincost){
-		    //	    System.out.println("d[i]: "+d[i]);
 		    mincost=d[i];
 		    u=i;
 		}
@@ -227,16 +220,13 @@ class Dijkstra{ //referenced to p305 algorithms
 		break;
 	    }
 	    color[u]=b;
-	    //   System.out.println("BLACK!");
 	    for(v=1;v<=size;v++){
 		if(color[v]!=b &&n[u][v]!=INF){
 		    if(d[v]>d[u]+n[u][v]){
 			d[v]= d[u]+n[u][v];
 			p[v]=u;
 			color[v]=g;
-			//	System.out.println("GRAY!");
 		    }
-		    //		    if(d[v]=d[u]+n[u][v]){}
 		}
 	    }
 	}
@@ -265,10 +255,10 @@ class Dijkstra{ //referenced to p305 algorithms
     }
 
     
-    public String rep_NumtoS(int d,boolean bla){
+    public String rep_NumtoS(int d,boolean bla,int na,int nc){
 	String s1,s2="";
 	if(bla)s2=" ";
-	if(psize<d){
+	if(psize<d&&d<=size-na-nc){
 	    s1=Integer.toString(d-psize);
 	    s2=s2+"C";
 	}else{
@@ -276,33 +266,14 @@ class Dijkstra{ //referenced to p305 algorithms
 	}
 	return s2+s1;
     }
-    /*  public String RouteS(int ed){
-	String c="";
-	int i,po;
-	po=p[ed];
-	if(po!=-1){
-	  c=rep_NumtoS(ed,true)+c;
-         }else {
-	  c=rep_NumtoS(ed,false)+c;
-	}
-	while(po!=-1){
-	 if(p[po]==-1){
-	     c=rep_NumtoS(po,false)+c;
-	 }else{
-	     c=rep_NumtoS(po,true)+c;
-	 }
-	    po=p[po];
-	}
-	return c;
-	}*/
-           public String RouteSntimes(int p){
+    public String RouteSntimes(int p,int na,int nc){
 	       String c="";
 	       int[] myroute=(a.get(p-1)).getroute();
 	       for(int i=1;i<myroute.length;i++){
 		   if(i==1){
-		       c=c+rep_NumtoS(myroute[i],false);
+		       c=c+rep_NumtoS(myroute[i],false,na,nc);
 		   }else{
-		       c=c+rep_NumtoS(myroute[i],true);
+		       c=c+rep_NumtoS(myroute[i],true,na,nc);
 		   }
 	       }
 	       return c;
@@ -328,11 +299,7 @@ class Dijkstra{ //referenced to p305 algorithms
    public int[] retRoute(){
 	return Route(this.ed);
     }
-    
-    /* public String retRouteS(){
-	return RouteS(this.ed);
-	}*/
-    public String retRouteS(int p){
-	return RouteSntimes(p);
+    public String retRouteS(int p,int na,int nc){
+	return RouteSntimes(p,na,nc);
     }
 }

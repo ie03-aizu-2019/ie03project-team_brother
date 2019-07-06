@@ -271,6 +271,7 @@ class Phase3_9{
 
     // task 3,4,5,6
     public static void Kth_ShortestPath(){
+ 	System.out.println("\nK-th shortest paths in this graph:");
 	for(int i=1; i<=Q; i++){
 	    int sint = 0;
 	    int dint = 0;
@@ -290,18 +291,20 @@ class Phase3_9{
 	    }
 	    	    
 	    sint += Integer.parseInt(s[i]);
-	    dint += Integer.parseInt(d[i]);	    	
+	    dint += Integer.parseInt(d[i]);
+	    System.out.println("\nQuery:"+i);
 	    
-	    if(sint>N+IpArray.length || dint>N+IpArray.length)
+	    if(sint>N+IpArray.length+NewAdd.size()+NewConnect.size()
+	       || dint>N+IpArray.length+NewAdd.size()+NewConnect.size())
 		System.out.println("NA");
 	    
 	    else{
 		dijk_ans = dijk.nTimesnTon(graph, sint, dint, graph.length-1, N, k[i]);
-
+  
 		for(int j=1; j<dijk_ans.length; j++){
 		    if(dijk_ans[j]>0){
 			System.out.printf("%.5f\n",dijk_ans[j]);
-			System.out.println(dijk.retRouteS(j));
+			System.out.println(dijk.retRouteS(j,NewAdd.size(), NewConnect.size()));
 		    }
 
 		    else if(j==1){
@@ -434,7 +437,7 @@ class Phase3_9{
 		}
 	    }
 	}
-
+        System.out.println("\nHighways in this graph:");
 	// outputs
 	for(int i=0; i<S_highways.size(); i++){
 	    // start point
