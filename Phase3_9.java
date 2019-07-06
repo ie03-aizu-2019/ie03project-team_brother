@@ -21,6 +21,11 @@ class Phase3_9{
     static Point[] IpArray;
     static ArrayList<Point> Ip = new ArrayList<Point>();
 
+    // Add new added point on projection method(task 7)
+    static ArrayList<Point> NewAdd = new ArrayList<Point>();
+    static ArrayList<Point> NewConnect = new ArrayList<Point>();
+    static ArrayList<Line>  NewLine = new ArrayList<Line>();
+
     static double[][] graph; // graph
     
     public static void main(String argv[]){
@@ -28,87 +33,67 @@ class Phase3_9{
 	// input data
 	InputData();
 
-	// Ip init
-	Ip.add(new Point(-1,-1));
-
-	// calclation Intersection Point
-	calcIntersection();
+	// register intersection point
+	RegistIntersection();
 	
-	IpArray = new Point[Ip.size()];
-	Ip.toArray(IpArray);
-
-	// sort
-	IpArray = sort.shellSort(IpArray,IpArray.length-1);
-	
-	// set id
-	for(int i=1; i<IpArray.length; i++){
-	    IpArray[i].setID(p.length + i-1);
-	    
-	    for(int j=1; j<l.length; j++)
-		l[j].setID(IpArray[i]);
-	}
-
 	// result
 	//for(int i=1; i<IpArray.length; i++)
 	//  System.out.printf("%.5f %.5f\n"
 	//	      ,IpArray[i].getX(),IpArray[i].getY());
-
-	for(int i=1; i<=P; i++)
+	
+	for(int i=1; i<=P; i++){
 	    Projection(ad[i]);
+	}
 
+	// set ID(NewAdd)
+	for(int i=0; i<NewAdd.size(); i++){
+	    NewAdd.get(i).setID(N + IpArray.length + i);
+	    // System.out.println(NewAdd.get(i).getID());
+	}
+
+	// set ID(NewConnect)
+	for(int i=0; i<NewConnect.size(); i++){
+	    NewConnect.get(i).setID(N + IpArray.length + NewAdd.size() + i);
+	    // System.out.println(NewConnect.get(i).getID());
+	}
+
+	// output(for debug)
+	/*
+	for(int i=0; i<NewAdd.size(); i++)
+	    System.out.printf("add[%d]%d  %.2f %.2f\n"
+			      ,i, NewAdd.get(i).getID(), NewAdd.get(i).getX(), NewAdd.get(i).getY());
+	for(int i=0; i<NewConnect.size(); i++)
+	    System.out.printf("con[%d]%d  %.2f %.2f\n"
+			      ,i, NewConnect.get(i).getID(), NewConnect.get(i).getX(), NewConnect.get(i).getY());
+	for(int i=0; i<NewLine.size(); i++)
+	    System.out.printf("line[%d] (%.2f %.2f) -> (%.2f %.2f)\n"
+			      , i
+			      , NewLine.get(i).getStart().getX(), NewLine.get(i).getStart().getY()
+			      , NewLine.get(i).getEnd().getX(), NewLine.get(i).getEnd().getY());
+	*/
+	
 	// make a weighted graph
 	makeGraph();
 
-	//for(int i=1; i<graph.length; i++){
-	//for(int j=1; j<graph[i].length; j++){
-	//System.out.printf("%.2f ",graph[i][j]);
-	//}
-	//System.out.println();
-	//}
-	
-	// input data
-	for(int i=1; i<=Q; i++){
-	    int sint = 0;
-	    int dint = 0;
-	    double[] dijk_ans;
-	    
-	    if(s[i].startsWith("C")){
-		s[i] = s[i].substring(1);
-		sint += N;
-	    }
+	// graph output(for debug)
+	/*
+	for(int i=1; i<graph.length; i++){
+	    for(int j=1; j<graph[i].length; j++){
+		if(graph[i][j]==0)
+		    System.out.printf("---- ");
 
-	    if(d[i].startsWith("C")){
-		d[i] = d[i].substring(1);
-		dint += N;
+		else
+		    System.out.printf("%.2f ",graph[i][j]);
 	    }
-	    	    
-	    sint += Integer.parseInt(s[i]);
-	    dint += Integer.parseInt(d[i]);	    	
-	    
-	    if(sint>N+IpArray.length || dint>N+IpArray.length)
-		System.out.println("NA");
-	    
-	    else{
-		dijk_ans = dijk.nTimesnTon(graph, sint, dint, graph.length-1, N, k[i]);
-
-		for(int j=1; j<dijk_ans.length; j++){
-		    if(dijk_ans[j]>0){
-			System.out.printf("%.5f\n",dijk_ans[j]);
-			System.out.println(dijk.retRouteS(j));
-		    }
-
-		    else if(j==1){
-			System.out.println("NA");
-		    }
-		    
-		    else
-			break;  
-		}
-	    }
+	    System.out.println();
 	}
+	*/
 	
-	// and more...
-	//getHighways();
+	// shortest path
+	Kth_ShortestPath();
+	
+	// highways
+	getHighways();
     }
 
     public static void InputData(){
@@ -151,6 +136,7 @@ class Phase3_9{
 	}
     }
 
+    // task 1
     public static void calcIntersection(){
 	Point ans;
 	double isin;
@@ -173,8 +159,7 @@ class Phase3_9{
 		    // check Ip has same point
 		    hasflag = 0;
 		    for(int k=1; k<Ip.size(); k++){
-			if(-EPS<=Ip.get(k).getX()-ans.getX() && Ip.get(k).getX()-ans.getX()<=EPS
-			   && -EPS<=Ip.get(k).getY()-ans.getY() && Ip.get(k).getY()-ans.getY()<=EPS){
+			if(HasAlready(Ip.get(k), ans)){
 			    hasflag = 1;
 			}
 		    }
@@ -217,9 +202,44 @@ class Phase3_9{
 	}
     }
 
+    public static boolean HasAlready(Point a, Point b){
+	if(-EPS<=a.getX()-b.getX() && a.getX()-b.getX()<=EPS
+	   && -EPS<=a.getY()-b.getY() && a.getY()-b.getY()<=EPS)
+	    return true;
+
+	return false;
+    }
+
+    // task 2
+    public static void RegistIntersection(){
+	// Ip init
+	Ip.add(new Point(-1,-1));
+
+	// calclation Intersection Point
+	calcIntersection();
+	
+	IpArray = new Point[Ip.size()];
+	Ip.toArray(IpArray);
+
+	// sort
+	IpArray = sort.shellSort(IpArray,IpArray.length-1);
+	
+	// set id
+	for(int i=1; i<IpArray.length; i++){
+	    IpArray[i].setID(p.length + i-1);
+	    
+	    for(int j=1; j<l.length; j++)
+		l[j].setID(IpArray[i]);
+	}
+
+    }
+
+    // make weighted graph
     public static void makeGraph(){
 	
-	graph = new double[N + IpArray.length][N + IpArray.length];
+	graph = new double
+	    [N + IpArray.length + NewAdd.size() + NewConnect.size()]
+	    [N + IpArray.length + NewAdd.size() + NewConnect.size()];
 	
 	// graph initialize(all weights set 0)
 	for(int i=0; i<graph.length; i++){
@@ -239,8 +259,63 @@ class Phase3_9{
 		    = dist.pTop(l[i].getList(j+1), l[i].getList(j));
 	    }
 	}
+
+	for(int i=0; i<NewLine.size(); i++){
+	    graph[NewLine.get(i).getStart().getID()][NewLine.get(i).getEnd().getID()]
+		= dist.pTop(NewLine.get(i).getStart(), NewLine.get(i).getEnd());
+
+	    graph[NewLine.get(i).getEnd().getID()][NewLine.get(i).getStart().getID()]
+		= dist.pTop(NewLine.get(i).getStart(), NewLine.get(i).getEnd());
+	}
     }
 
+    // task 3,4,5,6
+    public static void Kth_ShortestPath(){
+	for(int i=1; i<=Q; i++){
+	    int sint = 0;
+	    int dint = 0;
+	    double[] dijk_ans;
+	    String route;
+
+	    // convert C point to integer(start)
+	    if(s[i].startsWith("C")){
+		s[i] = s[i].substring(1);
+		sint += N;
+	    }
+	    
+	    // convert C point to integer(end)
+	    if(d[i].startsWith("C")){
+		d[i] = d[i].substring(1);
+		dint += N;
+	    }
+	    	    
+	    sint += Integer.parseInt(s[i]);
+	    dint += Integer.parseInt(d[i]);	    	
+	    
+	    if(sint>N+IpArray.length || dint>N+IpArray.length)
+		System.out.println("NA");
+	    
+	    else{
+		dijk_ans = dijk.nTimesnTon(graph, sint, dint, graph.length-1, N, k[i]);
+
+		for(int j=1; j<dijk_ans.length; j++){
+		    if(dijk_ans[j]>0){
+			System.out.printf("%.5f\n",dijk_ans[j]);
+			System.out.println(dijk.retRouteS(j));
+		    }
+
+		    else if(j==1){
+			System.out.println("NA");
+		    }
+		    
+		    else
+			break;  
+		}
+	    }
+	}
+    }
+
+    // task 7
     public static void Projection(Point ad_0){
 	Point orth;  // orthogonal projection vector
 	Point st;
@@ -251,7 +326,24 @@ class Phase3_9{
 	double isin;
 	
 	Point s_orth = new Point(0, 0);
-	double shortest = 999;
+	double shortest = 100000000;
+	int shortest_ind = -1;
+	
+	for(int i=1; i<=N; i++){
+	    if(HasAlready(p[i],ad_0))
+		return;
+	}
+	
+	NewAdd.add(ad_0);
+
+	for(int i=1; i<=M; i++){
+	    isin = dist.pTop(l[i].getStart(),ad_0)+dist.pTop(ad_0,l[i].getEnd())
+		- dist.pTop(l[i].getStart(),l[i].getEnd());
+	    if(-EPS<=isin && isin<=EPS){
+		shortest_ind = i;
+		return;
+	    }
+	}
 
 	for(int i=1; i<=N; i++){
 	    d = dist.pTop(ad_0, p[i]);
@@ -294,13 +386,31 @@ class Phase3_9{
 	    
 	    if(shortest > d){
 		shortest = d;
+		shortest_ind = i;
 		s_orth = orth;
 	    }
 	}
 
+	// shortest != 0
+	if(!(-EPS <= shortest && shortest <= EPS)){
+	    // connect point == one of graph points
+	    for(int i=1; i<N; i++){
+		if(HasAlready(p[i],s_orth)){
+		    NewLine.add(new Line(ad_0, s_orth));
+		    return;
+		}
+	    }
+
+	    // connect point is new point in graph
+	    NewConnect.add(s_orth);
+	    // System.out.println("line: "+shortest_ind);
+	    l[shortest_ind].insert(s_orth);
+	    NewLine.add(new Line(ad_0, s_orth));
+	}
 	//System.out.println((float)s_orth.getX()+" "+(float)s_orth.getY());
     }
 
+    // task 8
     public static void getHighways(){
 	double g_back;
 	ArrayList<Integer> S_highways = new ArrayList<Integer>();
@@ -325,15 +435,18 @@ class Phase3_9{
 	    }
 	}
 
+	// outputs
 	for(int i=0; i<S_highways.size(); i++){
-	    if(S_highways.get(i)>N){
-		System.out.printf("C%d ", S_highways.get(i) - N);
+	    // start point
+	    if(S_highways.get(i)>N && S_highways.get(i)<N + Ip.size()){
+	    	System.out.printf("C%d ", S_highways.get(i) - N);
 	    }
 	    else{
 		System.out.printf("%d ", S_highways.get(i));
 	    }
 
-	    if(E_highways.get(i)>N){
+	    // end point
+	    if(E_highways.get(i)>N && E_highways.get(i)<N + Ip.size()){
 		System.out.printf("C%d\n", E_highways.get(i) - N);
 	    }
 	    else{
