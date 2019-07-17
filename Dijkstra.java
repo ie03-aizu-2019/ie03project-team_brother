@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map.Entry;
 
 class Dijkstra{ //referenced to p305 algorithms
     private int INF = Integer.MAX_VALUE;
@@ -19,7 +20,7 @@ class Dijkstra{ //referenced to p305 algorithms
     private ArrayList<Hasroute>a;//確定 0origin
     Dijkstra(){
     }
-    double[] nTimesnTon(double[][]n,int st,int ed,int size,int psize,int times){
+    double[] nTimesnTon(ArrayList<AdjacencyList>n,int st,int ed,int size,int psize,int times){
 	this.size=size;
 	double[]ret=new double[times+1];
 	Hasroute spurroute,test;
@@ -29,9 +30,11 @@ class Dijkstra{ //referenced to p305 algorithms
 	    ret[i]=-1;
 	}
 	delind=new ArrayList<Hasroute>();
-	double[][]n2=new double[size+1][size+1];
+	//	double[][]n2=new double[size+1][size+1];
+	AdjacencyList [] n2 = new AdjacencyList[size+1];
 	myclone(n,n2);
-	double[][]n3=new double[size+1][size+1];
+	//	double[][]n3=new double[size+1][size+1];
+	AdjacencyList [] n3 = new AdjacencyList[size+1];
 	myclone(n,n3);
 	int p,p2,bcnt=0;
         a=new ArrayList<Hasroute>();//確定 0origin
@@ -50,7 +53,7 @@ class Dijkstra{ //referenced to p305 algorithms
 			}
 			System.out.println("");
 			}*/
-		hz=nTon(n,st,ed,size,psize);
+		hz=nTon(n2,st,ed,size,psize);
 		if(hz==-1.0)return ret;
 
                 a.add(new Hasroute(d[ed],Route(ed),d,psize));
@@ -64,32 +67,30 @@ class Dijkstra{ //referenced to p305 algorithms
 		//System.out.println(delind.size());//test
 		for(int j=1;j<spurroute.getroute().length;j++){
     		    spurnode=(spurroute.getroute())[j];
+		    //add node step by step
 		    spurroute_sep.addn(spurnode);
 			    for(int z=0;z<delind.size();z++){
 				if(spurroute_sep.equals(delind.get(z))){
 				    if(delind.get(z).getnext()!=-2){
-				    n3[spurnode][(delind.get(z)).getnext()]=INF;
-				    n3[(delind.get(z)).getnext()][spurnode]=INF;		     
+					/*n3[spurnode][(delind.get(z)).getnext()]=INF;
+					  n3[(delind.get(z)).getnext()][spurnode]=INF;*/
+				 n3[spurnode].remove((delind.get(z)).getnext());
+				 n3[(delind.get(z)).getnext()].remove(spurnode);	 	
 			            }
 				}
 			    }
 		   preSpur(spurroute,j);
 		   hz=spurnTon(n3,st,ed,size,psize);
        		   if(hz==-1.0){
-		       //        System.out.println("out!!\n");
-			   n3=new double[size+1][size+1];
 		           myclone(n,n3);	      //初期化
 		       continue;
 		   }
 	      	   test=new Hasroute(d[ed],Route(ed),d,psize);
 		       if(a.contains(test)||b.contains(test)){//重複を除く
-			   //		      System.out.println("out!\n");
-			      n3= new double[size+1][size+1];
 		              myclone(n,n3);	      //初期化
 			   continue;
 		       }
 		   b.add(test);
-		   n3=new double[size+1][size+1];
 		   myclone(n,n3);	      //初期化
 		}
 		if(b.size()==0){
@@ -112,12 +113,18 @@ class Dijkstra{ //referenced to p305 algorithms
 	    }
 	return ret;
     }
-    void myclone(double[][] n,double[][]opo){
-	for(int i=0;i<=size;i++){
+    void myclone(/*double[][] n,double[][]opo*/ ArrayList<AdjacencyList> n,AdjacencyList[]opo){
+	/*	for(int i=0;i<=size;i++){
 	    for(int j = 0;j<=size;j++){
 	        opo[i][j]=n[i][j];
 	    }
-	}
+	    }*/
+	for(int i=1;i<=size;i++){
+	    opo[i]=new AdjacencyList();
+	    for(Entry<Integer,Double>entry: /*n[i].entrySet()*/n.get(i).entrySet()){
+		opo[i].put((Integer)(entry.getKey()),(Double)(entry.getValue()));
+	    }
+	}	
     }
     void delroute(Hasroute a){
 	int[]route= a.getroute();
@@ -147,7 +154,7 @@ class Dijkstra{ //referenced to p305 algorithms
 	}
 	return;
     }
-    double nTon(double[][]n,int st,int ed,int size,int psize){
+    double nTon(AdjacencyList[]n,int st,int ed,int size,int psize){
 	color=new int[size+1];
 	d=new double[size+1];
 	p=new int[size+1];
@@ -155,18 +162,19 @@ class Dijkstra{ //referenced to p305 algorithms
 	this.ed=ed;
 	this.st=st;
 	this.psize=psize;
-	double hz;
+	double hz,disn;
 	int u,v;
 	double mincost;
 	Hasroute ihas;
 	for(int i=1;i<=size;i++){
 	    d[i]=INF;
 	    color[i]=w;
+	    /*Adjacency list does not need to INF
 	    for(int j=1;j<=size;j++){
 		if(!(n[i][j]>0.0)){
 		    n[i][j]=INF;
 		}
-	    }
+		}*/
 	}
 	d[st]=0;
 	p[st]=-1;
@@ -184,22 +192,34 @@ class Dijkstra{ //referenced to p305 algorithms
 	    color[u]=b;
 
 	    for(v=1;v<=size;v++){
+		/*
 		if(color[v]!=b &&n[u][v]!=INF){
 		    if(d[v]>d[u]+n[u][v]){
 			d[v]= d[u]+n[u][v];
 			p[v]=u;
 			color[v]=g;
 		    }
-		}
+		    }*/
+		//		disn=n[u].get(v);//n[u][v]
+	
+		if(color[v]!=b &&n[u].containsKey(v)){
+	       	disn=n[u].get(v);//n[u][v]
+		    if(d[v]>d[u]+disn){
+			d[v]= d[u]+disn;
+			p[v]=u;
+			color[v]=g;
+		    }
+		}		
 	    }
 	}
 	if(d[ed]==INF)return -1.0;
 	return d[ed];
     }
-    double spurnTon(double[][]n,int st,int ed,int size,int psize){
-	double hz;
+    double spurnTon(AdjacencyList[]n,int st,int ed,int size,int psize){
+	double hz,disn;
 	int u,v;
 	double mincost;
+	/* Adjacency list does not need to INF
 	for(int i=1;i<=size;i++){
 	    for(int j=1;j<=size;j++){
 		if(!(n[i][j]>0.0)){
@@ -207,6 +227,7 @@ class Dijkstra{ //referenced to p305 algorithms
 		}
 	    }
 	}
+	*/
 	while(true){
 	    mincost=INF;
 	    u=-1;
@@ -221,6 +242,7 @@ class Dijkstra{ //referenced to p305 algorithms
 	    }
 	    color[u]=b;
 	    for(v=1;v<=size;v++){
+		/*
 		if(color[v]!=b &&n[u][v]!=INF){
 		    if(d[v]>d[u]+n[u][v]){
 			d[v]= d[u]+n[u][v];
@@ -228,6 +250,15 @@ class Dijkstra{ //referenced to p305 algorithms
 			color[v]=g;
 		    }
 		}
+		*/	
+		if(color[v]!=b &&n[u].containsKey(v)){
+		disn=n[u].get(v);//n[u][v]	
+		    if(d[v]>d[u]+disn){
+			d[v]= d[u]+disn;
+			p[v]=u;
+			color[v]=g;
+		    }
+		} 
 	    }
 	}
 	if(d[ed]==INF)return -1.0;
