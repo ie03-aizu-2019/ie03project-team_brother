@@ -230,6 +230,7 @@ class Generator{
 	return C/dev;
     }
 
+    /*
     private static int Intersection(ArrayList<Pair> pts, ArrayList<Pair> lns){
 	int count=0;
 	Point ans;
@@ -247,6 +248,7 @@ class Generator{
 	
 	return count;
     }
+    */
 
     public static Line PairToLine(Pair l, ArrayList<Pair> p){
 	Point start = new Point(p.get(l.get1()-1).get1(), p.get(l.get1()-1).get2());
@@ -382,7 +384,8 @@ class Generator{
 	    for(int j=0; j<pt.size(); j+=2){
 		if(i*2 == j) continue;
 
-		if(pt.get(i*2).isEqualN(pt.get(j)) || pt.get(i*2+1).isEqualN(pt.get(j+1))){
+		if(pt.get(i*2).isEqualN(pt.get(j)) || pt.get(i*2+1).isEqualN(pt.get(j+1))
+		   || pt.get(i*2).isEqualN(pt.get(j+1)) || pt.get(i*2+1).isEqualN(pt.get(j))){
 		    pt.remove(i);
 		    pt.remove(i);
 		    i--;
