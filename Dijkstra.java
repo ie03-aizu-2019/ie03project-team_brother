@@ -2,9 +2,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map.Entry;
+import java.util.PriorityQueue;
 
 class Dijkstra{ //referenced to p305 algorithms
-    private int INF = Integer.MAX_VALUE;
+    private double INF = Integer.MAX_VALUE;
     private int w=0;
     private int g=1;
     private int b=2;
@@ -18,6 +19,7 @@ class Dijkstra{ //referenced to p305 algorithms
     private int ed;
     private ArrayList<Hasroute>delind;
     private ArrayList<Hasroute>a;//確定 0origin
+    PriorityQueue<Node> nodes = new PriorityQueue<Node>(new Mycomparator_Node());
     Dijkstra(){
     }
     double[] nTimesnTon(ArrayList<AdjacencyList>n,int st,int ed,int size,int psize,int times){
@@ -166,6 +168,7 @@ class Dijkstra{ //referenced to p305 algorithms
 	int u,v;
 	double mincost;
 	Hasroute ihas;
+	Node node;
 	for(int i=1;i<=size;i++){
 	    d[i]=INF;
 	    color[i]=w;
@@ -174,43 +177,30 @@ class Dijkstra{ //referenced to p305 algorithms
 		if(!(n[i][j]>0.0)){
 		    n[i][j]=INF;
 		}
-		}*/
+	    }*/
 	}
 	d[st]=0;
 	p[st]=-1;
-     
-	while(true){
-	    mincost=INF;
-	    u=-1;
-	    for(int i=1;i<=size;i++){
-		if(color[i]!=b && d[i]<mincost){
-		    mincost=d[i];
-		    u=i;
-		}
+	nodes.add(new Node(st,0));
+	node = nodes.poll();
+        while(node!=null){
+	    color[node.getNode()]=b;
+	    if(d[node.getNode()]<node.getDis()){
+		node=nodes.poll();
+		continue;
 	    }
-	    if(u==-1) break;
-	    color[u]=b;
-
-	    for(v=1;v<=size;v++){
-		/*
-		if(color[v]!=b &&n[u][v]!=INF){
-		    if(d[v]>d[u]+n[u][v]){
-			d[v]= d[u]+n[u][v];
-			p[v]=u;
-			color[v]=g;
-		    }
-		    }*/
-		//		disn=n[u].get(v);//n[u][v]
-	
-		if(color[v]!=b &&n[u].containsKey(v)){
-	       	disn=n[u].get(v);//n[u][v]
-		    if(d[v]>d[u]+disn){
-			d[v]= d[u]+disn;
-			p[v]=u;
-			color[v]=g;
-		    }
-		}		
-	    }
+	    for(int entry:n[node.getNode()].keySet()){	    
+	       if(color[entry]!=b &&n[node.getNode()].containsKey(entry)){
+		   disn=n[node.getNode()].get(entry);//n[u][v]
+		   if(d[entry]>d[node.getNode()]+disn){
+		       d[entry]=d[node.getNode()]+disn;
+		       color[entry]=g;
+		       nodes.add(new Node(entry,d[entry]));
+		       p[entry]=node.getNode();	       
+		   }
+	       }
+	     }
+	    node=nodes.poll();
 	}
 	if(d[ed]==INF)return -1.0;
 	return d[ed];
@@ -219,6 +209,7 @@ class Dijkstra{ //referenced to p305 algorithms
 	double hz,disn;
 	int u,v;
 	double mincost;
+	Node node;
 	/* Adjacency list does not need to INF
 	for(int i=1;i<=size;i++){
 	    for(int j=1;j<=size;j++){
@@ -226,44 +217,32 @@ class Dijkstra{ //referenced to p305 algorithms
 		    n[i][j]=INF;
 		}
 	    }
-	}
-	*/
-	while(true){
-	    mincost=INF;
-	    u=-1;
-	    for(int i=1;i<=size;i++){
-		if(color[i]!=b && d[i]<mincost){
-		    mincost=d[i];
-		    u=i;
-		}
+	    }*/
+	node=null;
+	node = nodes.poll();
+        while(node!=null){
+	    color[node.getNode()]=b;
+	    if(d[node.getNode()]<node.getDis()){
+		node=null;
+		node=nodes.poll();
+		continue;
 	    }
-	    if(u==-1) {
-		break;
+	    for(int entry:n[node.getNode()].keySet()){	
+	       if(color[entry]!=b &&n[node.getNode()].containsKey(entry)){
+		   disn=n[node.getNode()].get(entry);//n[u][v]
+		   if(d[entry]>d[node.getNode()]+disn){
+		       d[entry]=d[node.getNode()]+disn;
+		       color[entry]=g;
+		       nodes.add(new Node(entry,d[entry]));
+		       p[entry]=node.getNode();
+		   }
+	       }
 	    }
-	    color[u]=b;
-	    for(v=1;v<=size;v++){
-		/*
-		if(color[v]!=b &&n[u][v]!=INF){
-		    if(d[v]>d[u]+n[u][v]){
-			d[v]= d[u]+n[u][v];
-			p[v]=u;
-			color[v]=g;
-		    }
-		}
-		*/	
-		if(color[v]!=b &&n[u].containsKey(v)){
-		disn=n[u].get(v);//n[u][v]	
-		    if(d[v]>d[u]+disn){
-			d[v]= d[u]+disn;
-			p[v]=u;
-			color[v]=g;
-		    }
-		} 
-	    }
+	    node=nodes.poll();
 	}
 	if(d[ed]==INF)return -1.0;
 	return d[ed];
-    }
+}
     public void preSpur(Hasroute h,int ind){
 	int i;
 	for(i=0;i<=size ; i++){
@@ -279,10 +258,10 @@ class Dijkstra{ //referenced to p305 algorithms
 	    d[ro[i]]=adis[ro[i]];
 	    if(ro[i]==ed)break;
 	}
-
 	 color[ro[i]]=g;
 	 p[ro[i]]=ro[i-1];
 	 d[ro[i]]=adis[ro[i]];
+    	 nodes.add(new Node(ro[i],d[ro[i]]));
     }
 
     
