@@ -388,12 +388,13 @@ class Phase3_10{
 	}
 	
 	NewAdd.add(ad_0);
-
+	
 	for(int i=1; i<=M; i++){
 	    isin = dist.pTop(l[i].getStart(),ad_0)+dist.pTop(ad_0,l[i].getEnd())
 		- dist.pTop(l[i].getStart(),l[i].getEnd());
 	    if(-EPS<=isin && isin<=EPS){
 		shortest_ind = i;
+		l[shortest_ind].insert(ad_0);
 		return;
 	    }
 	}
@@ -431,13 +432,13 @@ class Phase3_10{
 	    
 	    orth.add(st_backup);
 	    d = dist.pTop(ad_0, orth);
-
+	    
 	    if(-EPS<=d && d<=EPS)  // except d = 0
 		continue;
 	    
 	    // System.out.println(d+"["+orth.getX()+" "+orth.getY()+"]");
-	    
 	    if(shortest > d){
+		// System.out.println(shortest+"  "+d);
 		shortest = d;
 		shortest_ind = i;
 		s_orth = orth;
@@ -447,7 +448,7 @@ class Phase3_10{
 	// shortest != 0
 	if(!(-EPS <= shortest && shortest <= EPS)){
 	    // connect point == one of graph points
-	    for(int i=1; i<N; i++){
+	    for(int i=1; i<=N; i++){
 		if(HasAlready(p[i],s_orth)){
 		    NewLine.add(new Line(ad_0, s_orth));
 		    return;
@@ -456,9 +457,12 @@ class Phase3_10{
 
 	    // connect point is new point in graph
 	    NewConnect.add(s_orth);
-	    // System.out.println("line: "+shortest_ind);
-	    l[shortest_ind].insert(s_orth);
-	    NewLine.add(new Line(ad_0, s_orth));
+	    
+	    if(shortest_ind != -1){
+		// System.out.println("line: "+shortest_ind);
+		l[shortest_ind].insert(s_orth);
+		NewLine.add(new Line(ad_0, s_orth));
+	    }
 	}
 	//System.out.println((float)s_orth.getX()+" "+(float)s_orth.getY());
     }

@@ -126,12 +126,22 @@ class Generator{
 
     private static void init(int task){
 	Scanner sc = new Scanner(System.in);
-	
-	N = new Range(sc.nextInt());
-	M = new Range(sc.nextInt());
-	P = new Range(sc.nextInt());
-	Q = new Range(sc.nextInt());
 
+	if(task==10){
+	    int num = rnd.nextInt(200000 - 2) + 2;
+	    N = new Range(num + num%2);
+	    M = new Range(rnd.nextInt(N.getValue()/2) + 1);
+	    P = new Range(rnd.nextInt(1000+1));
+	    Q = new Range(rnd.nextInt(1000+1));
+	}
+	
+	else{
+	    N = new Range(sc.nextInt());
+	    M = new Range(sc.nextInt());
+	    P = new Range(sc.nextInt());
+	    Q = new Range(sc.nextInt());
+	}
+	
 	ranges(task);
     }
     
@@ -181,17 +191,32 @@ class Generator{
 	    Q.setRange(0,0);
 	    XYmax = 100000;
 	    break;
+	case 9:
+	    N.setRange(2,200);
+	    M.setRange(1,N.getValue());
+	    P.setRange(0,100);
+	    Q.setRange(0,100);
+	    XYmax = 100000;
+	    break;
+	case 10:
+	case 11:
+	    N.setRange(2,200000);
+	    M.setRange(1,100000);
+	    P.setRange(0,1000);
+	    Q.setRange(0,1000);
+	    XYmax = 1000000;
+	    break;
 	default:
 	    break;
 	}
     }
 
     private static boolean Condition(int task){
-	boolean cond1 = 0<task && task<=8;
+	boolean cond1 = 0<task && task<=11;
 	boolean cond2 = N.isValid() && M.isValid() && P.isValid() && Q.isValid();
-	boolean cond3 = M.getValue() <= Combination(N.getValue(),2);
-
-	return cond1 && cond2 && cond3;
+	//boolean cond3 = M.getValue() <= Combination(N.getValue(),2);
+	
+	return cond1 && cond2; //&& cond3;
     }
 
     private static int Combination(int prev, int next){
@@ -229,41 +254,52 @@ class Generator{
 	
 	return new Line(start, end);
     }
-
+    
     private static void setRandom(int task){
-	// N
-	for(int i=0; i<N.getValue(); i++){
-	    pt.add(new Pair(rnd.nextInt(XYmax+1), rnd.nextInt(XYmax+1)));
 
-	    for(int j=0; j<pt.size()-1; j++){
-		if(pt.get(i).isEqualN(pt.get(j))){
-		    pt.remove(i--);
-		    break;
-		}
-	    }
-	}
+	if(task==10)
+	    setNM_for10();
 
-	// M
-	LimitRandom lrnd = new LimitRandom(M.getValue()*2);
-
-	for(int i=0; i<M.getValue(); i++){
-	    if(task==1){
-		ln.add(new Pair(lrnd.getRandom(), lrnd.getRandom()));
-	    }
-
-	    else{
-		ln.add(new Pair(rnd.nextInt(N.getValue())+1, rnd.nextInt(N.getValue())+1));
+	else{
+	    
+	    // N
+	    for(int i=0; i<N.getValue(); i++){
+		pt.add(new Pair(rnd.nextInt(XYmax+1), rnd.nextInt(XYmax+1)));
 		
-		if(ln.get(i).get1() == ln.get(i).get2()){
-		    ln.remove(i--);
-		    continue;
-		}
-		
-		for(int j=0; j<ln.size()-1; j++){
-		    if(ln.get(i).isEqualM(ln.get(j))
-		       || ln.get(i).get1()==ln.get(i).get2()){
-			ln.remove(i--);
+		for(int j=0; j<pt.size()-1; j++){
+		    if(i==j) continue;
+		    
+		    if(pt.get(i).isEqualN(pt.get(j))){
+			pt.remove(i--);
 			break;
+		    }
+		}
+	    }
+	    
+	    // M
+	    LimitRandom lrnd = new LimitRandom(M.getValue()*2);
+	    
+	    for(int i=0; i<M.getValue(); i++){
+		if(task==1){
+		    ln.add(new Pair(lrnd.getRandom(), lrnd.getRandom()));
+		}
+		
+		else{
+		    ln.add(new Pair(rnd.nextInt(N.getValue())+1, rnd.nextInt(N.getValue())+1));
+		    
+		    if(ln.get(i).get1() == ln.get(i).get2()){
+			ln.remove(i--);
+			continue;
+		    }
+		    
+		    for(int j=0; j<ln.size()-1; j++){
+			if(i==j) continue;
+			
+			if(ln.get(i).isEqualM(ln.get(j))
+			   || ln.get(i).get1()==ln.get(i).get2()){
+			    ln.remove(i--);
+			    break;
+			}
 		    }
 		}
 	    }
@@ -279,30 +315,85 @@ class Generator{
 	    }
 
 	    for(int j=0; j<pin.size()-1; j++){
+		if(i==j) continue;
+		
 		if(pin.get(i).isEqualN(pin.get(j))){
 		    pin.remove(i--);
 		    break;
 		}
 	    }
 	}
-
+	
 	// Q
 	for(int i=0; i<Q.getValue(); i++){
 	    int k=1;
-
+	    
 	    if(!(task == 3 || task == 4))
 		k = rnd.nextInt(10)+1;
 	    
-	    qin.add(new Trio(rnd.nextInt(N.getValue() + Intersection(pt, ln) + 2) + 1,
-			     rnd.nextInt(N.getValue() + Intersection(pt, ln) + 2) + 1,
-			     k));
+	    //qin.add(new Trio(rnd.nextInt(N.getValue() + Intersection(pt, ln) + P.getValue() + 2) + 1,
+	    //	     rnd.nextInt(N.getValue() + Intersection(pt, ln) + P.getValue() + 2) + 1,
+	    //	     k));
 
-	    for(int j=0; j<pin.size()-1; j++){
+	    qin.add(new Trio(rnd.nextInt(M.getMax()), rnd.nextInt(M.getMax()), k));
+	    
+	    for(int j=0; j<qin.size()-1; j++){
+		if(i==j) continue;
+		
 		if(qin.get(i).isEqual(qin.get(j))){
 		    qin.remove(i--);
 		    break;
 		}
 	    }
+	}
+	
+    }
+
+    private static void setNM_for10(){
+	int XorY;
+	int sameX;
+	int sameY;
+	
+	// N
+	for(int i=0; i<N.getValue()/2; i++){
+	    XorY = rnd.nextInt(2);
+	    if(XorY == 0){
+		sameX = rnd.nextInt(XYmax+1);
+		pt.add(new Pair(sameX, rnd.nextInt(XYmax+1)));
+		pt.add(new Pair(sameX, rnd.nextInt(XYmax+1)));
+		
+		while(pt.get(pt.size()-2).isEqualN(pt.get(pt.size()-1))){
+		    pt.remove(pt.size()-1);
+		    pt.add(new Pair(sameX, rnd.nextInt(XYmax+1)));
+		}
+	    }
+	    
+	    else{
+		sameY = rnd.nextInt(XYmax+1);
+		pt.add(new Pair(rnd.nextInt(XYmax+1), sameY));
+		pt.add(new Pair(rnd.nextInt(XYmax+1), sameY));
+		
+		while(pt.get(pt.size()-2).isEqualN(pt.get(pt.size()-1))){
+		    pt.remove(pt.size()-1);
+		    pt.add(new Pair(rnd.nextInt(XYmax+1), sameY));
+		}
+	    }
+
+	    for(int j=0; j<pt.size(); j+=2){
+		if(i*2 == j) continue;
+
+		if(pt.get(i*2).isEqualN(pt.get(j)) || pt.get(i*2+1).isEqualN(pt.get(j+1))){
+		    pt.remove(i);
+		    pt.remove(i);
+		    i--;
+		    break; 
+		}
+	    }
+	}
+	
+	// M
+	for(int i=1; i<=M.getValue()*2; i+=2){
+	    ln.add(new Pair(i, i+1));
 	}
     }
     
@@ -329,12 +420,12 @@ class Generator{
 
 	// Q
 	for(int i=0; i<qin.size(); i++){
-	    if(qin.get(i).get1()>N.getValue())
+	    if(qin.get(i).get1()>N.getValue() && P.getValue()>qin.get(i).get1())
 		System.out.printf("C%d ",qin.get(i).get1() - N.getValue());
 	    else
 		System.out.printf("%d ",qin.get(i).get1());
 	    
-	    if(qin.get(i).get2()>N.getValue())
+	    if(qin.get(i).get2()>N.getValue() && P.getValue()>qin.get(i).get2())
 		System.out.printf("C%d ",qin.get(i).get2() - N.getValue());
 	    else
 		System.out.printf("%d ",qin.get(i).get2());
@@ -351,9 +442,14 @@ class Generator{
 	// sellect range
 	// input N, M, P, Q
 	init(Integer.parseInt(args[0]));
-
-	if(!Condition(Integer.parseInt(args[0])))
+	
+	if(!Condition(Integer.parseInt(args[0]))){
+	    System.out.println(N.getValue() + " " +
+			   M.getValue() + " " +
+			   P.getValue() + " " +
+			   Q.getValue() + " ");
 	    return;
+	}
 	
 	// generate data
 	// check data is correct
