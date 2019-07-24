@@ -23,6 +23,10 @@ class Range{
 	return max;
     }
 
+    public int getMin(){
+	return min;
+    }
+
     public boolean isValid(){
 	return min <= value && value <= max;
     }
@@ -211,6 +215,7 @@ class Generator{
 	}
     }
 
+    /*
     private static boolean Condition(int task){
 	boolean cond1 = 0<task && task<=11;
 	boolean cond2 = N.isValid() && M.isValid() && P.isValid() && Q.isValid();
@@ -218,6 +223,7 @@ class Generator{
 	
 	return cond1 && cond2; //&& cond3;
     }
+    */
 
     private static int Combination(int prev, int next){
 	int C=1, dev=1;
@@ -337,7 +343,9 @@ class Generator{
 	    //	     rnd.nextInt(N.getValue() + Intersection(pt, ln) + P.getValue() + 2) + 1,
 	    //	     k));
 
-	    qin.add(new Trio(rnd.nextInt(M.getMax()), rnd.nextInt(M.getMax()), k));
+	    qin.add(new Trio(rnd.nextInt(N.getValue()+M.getMax())+1,
+			     rnd.nextInt(N.getValue()+M.getMax())+1,
+			     k));
 	    
 	    for(int j=0; j<qin.size()-1; j++){
 		if(i==j) continue;
@@ -423,12 +431,12 @@ class Generator{
 
 	// Q
 	for(int i=0; i<qin.size(); i++){
-	    if(qin.get(i).get1()>N.getValue() && P.getValue()>qin.get(i).get1())
+	    if(qin.get(i).get1()>N.getValue() && P.getValue()<qin.get(i).get1())
 		System.out.printf("C%d ",qin.get(i).get1() - N.getValue());
 	    else
 		System.out.printf("%d ",qin.get(i).get1());
 	    
-	    if(qin.get(i).get2()>N.getValue() && P.getValue()>qin.get(i).get2())
+	    if(qin.get(i).get2()>N.getValue() && P.getValue()<qin.get(i).get2())
 		System.out.printf("C%d ",qin.get(i).get2() - N.getValue());
 	    else
 		System.out.printf("%d ",qin.get(i).get2());
@@ -439,18 +447,20 @@ class Generator{
 
     public static void main(String args[]){
 	// input task number
-	if(args.length<1)
+	if(args.length<1){
+	    System.err.println("Usage: Please input task number on command line.");
 	    return;
+	}
 	
-	// sellect range
+	// select range
 	// input N, M, P, Q
 	init(Integer.parseInt(args[0]));
 	
-	if(!Condition(Integer.parseInt(args[0]))){
-	    System.out.println(N.getValue() + " " +
-			   M.getValue() + " " +
-			   P.getValue() + " " +
-			   Q.getValue() + " ");
+	if(!(N.isValid() && M.isValid() && P.isValid() && Q.isValid())){
+	    System.err.println("Usage: N should be ["+N.getMin()+" - "+N.getMax()+"].");
+	    System.err.println("Usage: M should be ["+M.getMin()+" - "+M.getMax()+"].");
+	    System.err.println("Usage: P should be ["+P.getMin()+" - "+P.getMax()+"].");
+	    System.err.println("Usage: N should be ["+Q.getMin()+" - "+Q.getMax()+"].");
 	    return;
 	}
 	

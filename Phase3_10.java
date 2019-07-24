@@ -38,12 +38,8 @@ class Phase3_10{
 
 	// register intersection point
 	RegistIntersection();
-	
-	// result
-	//for(int i=1; i<IpArray.length; i++)
-	//  System.out.printf("%.5f %.5f\n"
-	//	      ,IpArray[i].getX(),IpArray[i].getY());
-	
+
+	// connect added points to existing points or lines
 	for(int i=1; i<=P; i++){
 	    Projection(ad[i]);
 	}
@@ -51,66 +47,21 @@ class Phase3_10{
 	// set ID(NewAdd)
 	for(int i=0; i<NewAdd.size(); i++){
 	    NewAdd.get(i).setID(N + IpArray.length + i);
-	    // System.out.println(NewAdd.get(i).getID());
 	}
 
 	// set ID(NewConnect)
 	for(int i=0; i<NewConnect.size(); i++){
 	    NewConnect.get(i).setID(N + IpArray.length + NewAdd.size() + i);
-	    // System.out.println(NewConnect.get(i).getID());
 	}
-
-	// output(for debug)
-	/*
-	for(int i=0; i<NewAdd.size(); i++)
-	    System.out.printf("add[%d]%d  %.2f %.2f\n"
-			      ,i, NewAdd.get(i).getID(), NewAdd.get(i).getX(), NewAdd.get(i).getY());
-	for(int i=0; i<NewConnect.size(); i++)
-	    System.out.printf("con[%d]%d  %.2f %.2f\n"
-			      ,i, NewConnect.get(i).getID(), NewConnect.get(i).getX(), NewConnect.get(i).getY());
-	for(int i=0; i<NewLine.size(); i++)
-	    System.out.printf("line[%d] (%.2f %.2f) -> (%.2f %.2f)\n"
-			      , i
-			      , NewLine.get(i).getStart().getX(), NewLine.get(i).getStart().getY()
-			      , NewLine.get(i).getEnd().getX(), NewLine.get(i).getEnd().getY());
-	*/
 	
 	// make a weighted graph
 	allPoint = N + IpArray.length + NewAdd.size() + NewConnect.size();
-	//makeGraph();
 	makeList();
-
-	// graph output(for debug)
-	/*
-	// graph(adjacency array)
-	for(int i=1; i<graph.length; i++){
-	    for(int j=1; j<graph[i].length; j++){
-		if(graph[i][j]==0)
-		    System.out.printf("---- ");
-
-		else
-		    System.out.printf("%.2f ",graph[i][j]);
-	    }
-	    System.out.println();
-	}
-	*/
-	// graph(adjacency list)
-	/*for(int i=1; i<list.size(); i++){
-	    System.out.printf("%2d: ",i);
-	    for(int j=1; j<allPoint; j++){
-		if(list.get(i).containsKey(j)){
-		    System.out.printf("[%2d, %.2f] ",j, list.get(i).get(j));
-		}
-	    }
-	    System.out.println();
-	    }*/
-	
 	
 	// shortest path
 	Kth_ShortestPath();
 	
 	// highways
-	// getHighways();
 	getHighways_ByList();
     }
 
@@ -160,6 +111,8 @@ class Phase3_10{
 	double isin;
 	int inflag;
 	int hasflag;
+
+	System.out.println("Intersection points:");
 	
 	for(int i=1; i<=M; i++){
 	    // intersection point
@@ -188,6 +141,9 @@ class Phase3_10{
 		    // If Ip doesn't have same point, insert this point
 		    if(hasflag!=1){
 			Ip.add(ans);
+			System.out.println("C"+Ip.size()+
+					   ": ("+Ip.get(Ip.size()-1).getX()+
+					   ", "+Ip.get(Ip.size()-1).getY()+")");
 		    }
 		}
 	    }
@@ -220,6 +176,8 @@ class Phase3_10{
 	}
     }
 
+    // if point a and point b are equal, it returns true.
+    // otherwise, it returns false.
     public static boolean HasAlready(Point a, Point b){
 	if(-EPS<=a.getX()-b.getX() && a.getX()-b.getX()<=EPS
 	   && -EPS<=a.getY()-b.getY() && a.getY()-b.getY()<=EPS)
@@ -251,40 +209,7 @@ class Phase3_10{
 	}
 
     }
-
-    // make weighted graph
-    /*public static void makeGraph(){
-	
-	graph = new double[allPoint][allPoint];
-	
-	// graph initialize(all weights set 0)
-	for(int i=0; i<graph.length; i++){
-	    for(int j=0; j<graph[i].length; j++){
-		graph[i][j] = 0;
-	    }
-	}
-
-	// graph input
-	for(int i=1; i<l.length; i++){
-	    for(int j=0; j<l[i].getSize()-1; j++){
-		graph[l[i].getList(j).getID()][l[i].getList(j+1).getID()]
-		    = dist.pTop(l[i].getList(j), l[i].getList(j+1));
-
-		
-		graph[l[i].getList(j+1).getID()][l[i].getList(j).getID()]
-		    = dist.pTop(l[i].getList(j+1), l[i].getList(j));
-	    }
-	}
-
-	for(int i=0; i<NewLine.size(); i++){
-	    graph[NewLine.get(i).getStart().getID()][NewLine.get(i).getEnd().getID()]
-		= dist.pTop(NewLine.get(i).getStart(), NewLine.get(i).getEnd());
-
-	    graph[NewLine.get(i).getEnd().getID()][NewLine.get(i).getStart().getID()]
-		= dist.pTop(NewLine.get(i).getStart(), NewLine.get(i).getEnd());
-	}
-    }
-    */
+    
     public static void makeList(){
 	// graph initialize
 	for(int i=0; i<allPoint; i++)
@@ -344,11 +269,7 @@ class Phase3_10{
 		System.out.println("NA");
 	    
 	    else{
-		//Using Adjancency matrix
-		//dijk_ans = dijk.nTimesnTon(graph, sint, dint, graph.length-1, N, k[i]);
-      
 		//Using Adjancency list
-
 		dijk_ans = dijk.nTimesnTon(list, sint, dint, list.size()-1, N, k[i]);
   
 		for(int j=1; j<dijk_ans.length; j++){
@@ -401,8 +322,6 @@ class Phase3_10{
 
 	for(int i=1; i<=N; i++){
 	    d = dist.pTop(ad_0, p[i]);
-
-	    // System.out.println(d+"["+p[i].getX()+" "+p[i].getY()+"]");
 	    
 	    if(shortest > d){
 		shortest = d;
@@ -436,9 +355,7 @@ class Phase3_10{
 	    if(-EPS<=d && d<=EPS)  // except d = 0
 		continue;
 	    
-	    // System.out.println(d+"["+orth.getX()+" "+orth.getY()+"]");
 	    if(shortest > d){
-		// System.out.println(shortest+"  "+d);
 		shortest = d;
 		shortest_ind = i;
 		s_orth = orth;
@@ -447,6 +364,7 @@ class Phase3_10{
 
 	// shortest != 0
 	if(!(-EPS <= shortest && shortest <= EPS)){
+	    
 	    // connect point == one of graph points
 	    for(int i=1; i<=N; i++){
 		if(HasAlready(p[i],s_orth)){
@@ -466,54 +384,6 @@ class Phase3_10{
 	}
 	//System.out.println((float)s_orth.getX()+" "+(float)s_orth.getY());
     }
-
-    // task 8
-    /*public static void getHighways(){
-	double g_back;
-	ArrayList<Integer> S_highways = new ArrayList<Integer>();
-	ArrayList<Integer> E_highways = new ArrayList<Integer>();
-	AdjacencyList[] adl;
-
-	for(int i=1; i<graph.length; i++){
-	    for(int j=i; j<graph[i].length; j++){
-		if(i==j)
-		    continue;
-		
-		if(graph[i][j]>0){
-		    g_back = graph[i][j];
-		    graph[i][j] = 0;
-		    if(dijk.nTon(graph, i, j,graph.length-1, N)<=0){
-			S_highways.add(i);
-			E_highways.add(j);
-		    }
-		    
-		    graph[i][j] = g_back;
-		}
-	    }
-	}
-	
-        System.out.println("\nHighways in this graph:");
-	
-	// outputs
-	for(int i=0; i<S_highways.size(); i++){
-	    // start point
-	    if(S_highways.get(i)>N && S_highways.get(i)<N + Ip.size()){
-	    	System.out.printf("C%d ", S_highways.get(i) - N);
-	    }
-	    else{
-		System.out.printf("%d ", S_highways.get(i));
-	    }
-
-	    // end point
-	    if(E_highways.get(i)>N && E_highways.get(i)<N + Ip.size()){
-		System.out.printf("C%d\n", E_highways.get(i) - N);
-	    }
-	    else{
-		System.out.printf("%d\n", E_highways.get(i));
-	    }
-	}
-    }
-    */
     
     // task 8(by using adjacency list)
     public static void getHighways_ByList(){
@@ -527,30 +397,15 @@ class Phase3_10{
 	    for(int j=i; j<allPoint; j++){
 		
 		if(list.get(i).containsKey(j)){
-		    /*g_back = graph[i][j];
-		      graph[i][j] = 0;*/
 		    g_back = list.get(i).get(j);
 		    list.get(i).remove(j);
 		    adl=list.toArray(new AdjacencyList[list.size()]);
 		    
-		    /*test adjacencyList*/
-		    /* for(int a =1;a<adl.length;a++){
-	            System.out.printf("%2d: ",a);
-	                for(int b=1; b<allPoint; b++){
-		         if(adl[a].containsKey(b)){
-		          System.out.printf("[%2d, %.2f] ",b, adl[a].get(b));
-	              	 }
-			}
-	                System.out.println();
-			}*/
-
-		    
-		    if(dijk.nTon(/*graph*/adl, i, j, list.size()-1, N)<=0){
+		    if(dijk.nTon(adl, i, j, list.size()-1, N)<=0){
 			S_highways.add(i);
 			E_highways.add(j);
 		    }
 		    
-		    //graph[i][j] = g_back;
 		    list.get(i).put(j,g_back);
 		}
 	    }
@@ -560,6 +415,7 @@ class Phase3_10{
 	
 	// outputs
 	for(int i=0; i<S_highways.size(); i++){
+	    
 	    // start point
 	    if(S_highways.get(i)>N && S_highways.get(i)<N + Ip.size()){
 	    	System.out.printf("C%d ", S_highways.get(i) - N);
