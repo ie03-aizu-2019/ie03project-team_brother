@@ -1,21 +1,25 @@
 import java.util.Arrays;
 
 class Hasroute implements Comparable<Hasroute>{
+    //Hasroute contains route and distance between start and end mainly.
     private double i;
     private int[]route;//1 origin!
     private double[] d;
     private int nextn = -2 ;
     private int psize = -1;
+    //Initialize only i and information of route.
     Hasroute(double i,int[] route){
 	this.i=i;
 	this.route=route;
     }
+    //Initialize i and information of route and distance 
     Hasroute(double i,int[] route,double[]d){
 	this.i=i;
 	this.route=route;
 	this.d=new double[d.length];
 	System.arraycopy(d,0,this.d,0,d.length);
     }
+    //Initialize i and information of route ant psize(numbers of original point)
     Hasroute(double i,int[] route,double[]d,int psize){
 	this.i=i;
 	this.route=route;
@@ -23,6 +27,7 @@ class Hasroute implements Comparable<Hasroute>{
 	System.arraycopy(d,0,this.d,0,d.length);
 	this.psize=psize;
     }
+    //Initialize with flag
     Hasroute(double i,int[] route,double[]d,int nextn,int flg){
 	this.i=i;
 	this.route=route;
@@ -59,6 +64,8 @@ class Hasroute implements Comparable<Hasroute>{
 	return 0;
 	
     }
+    
+    //Make string of path.but additional data is also "C"
     public String rep_NumtoS(int d,boolean bla){
 	String s1,s2="";
 	if(bla)s2=" ";
@@ -70,6 +77,8 @@ class Hasroute implements Comparable<Hasroute>{
 	}
 	return s2+s1;
     }
+
+    //Make String of path
     public String RouteSntimes(Hasroute h){
 	    String c="";
 	    int[] myroute=h.getroute();

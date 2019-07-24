@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
 
-class Dijkstra{ //referenced to p305 algorithms
+class Dijkstra{
     private double INF = Integer.MAX_VALUE;
     private int w=0;
     private int g=1;
@@ -28,99 +28,101 @@ class Dijkstra{ //referenced to p305 algorithms
 	Hasroute spurroute,test;
 	Hasroute spurroute_sep;
 	int spurnode,befonode;
+	
+	//initialize d[]
 	for(int i = 1;i<times+1;i++){
 	    ret[i]=-1;
 	}
 	delind=new ArrayList<Hasroute>();
-	//	double[][]n2=new double[size+1][size+1];
+	
+	//Make two AdjancyList(n2 = original ,n3 = can be delete (Using Yen's algorithms))
 	AdjacencyList [] n2 = new AdjacencyList[size+1];
 	myclone(n,n2);
-	//	double[][]n3=new double[size+1][size+1];
 	AdjacencyList [] n3 = new AdjacencyList[size+1];
 	myclone(n,n3);
+	
 	int p,p2,bcnt=0;
-        a=new ArrayList<Hasroute>();//確定 0origin
-	ArrayList<Hasroute>b=new ArrayList<Hasroute>();//不確定 0origin
+        a=new ArrayList<Hasroute>();//desided 0-origin
+	ArrayList<Hasroute>b=new ArrayList<Hasroute>();//not desided 0-origin
         double hz;
+
+	// "i" is "i" th shorthst path 
 	for(int i=1;i<=times;i++){
 	    if(i==1){
-		/*test n3*/
-		/* for(int k=1;k<=size;k++){
-			for(int l=1;l<=size;l++){
-			    if(n3[k][l]==INF){
-				System.out.print("0 ");
-			    }else{
-			    System.out.printf("%.2f ",n3[k][l]);
-			    }
-			}
-			System.out.println("");
-			}*/
+		//When first shortest path detecting, go to nTon(simple dijkstra).
 		hz=nTon(n2,st,ed,size,psize);
 		if(hz==-1.0)return ret;
-
+		
+                //1st shortest path is enterd A(desided route) 
                 a.add(new Hasroute(d[ed],Route(ed),d,psize));
-		//   System.out.println(Arrays.toString(Route(ed)));
-		delroute(a.get(a.size()-1));/////
+		
+		//delete route along first shortest path
+		delroute(a.get(a.size()-1));
 	    }
 	    if(i>1){
 		spurroute=a.get(a.size()-1);
 		
 		spurroute_sep=new Hasroute(0.0,new int[]{-1},new double[]{0.0},psize);
-		//System.out.println(delind.size());//test
 		for(int j=1;j<spurroute.getroute().length;j++){
     		    spurnode=(spurroute.getroute())[j];
-		    //add node step by step
 		    spurroute_sep.addn(spurnode);
+
+		    // delete route of n3 along delind[]
 			    for(int z=0;z<delind.size();z++){
 				if(spurroute_sep.equals(delind.get(z))){
 				    if(delind.get(z).getnext()!=-2){
-					/*n3[spurnode][(delind.get(z)).getnext()]=INF;
-					  n3[(delind.get(z)).getnext()][spurnode]=INF;*/
 				 n3[spurnode].remove((delind.get(z)).getnext());
 				 n3[(delind.get(z)).getnext()].remove(spurnode);	 	
 			            }
 				}
 			    }
+			    
+		   //prepare the parameter to use dijkstra
 		   preSpur(spurroute,j);
+
+		   //detect candidate path
 		   hz=spurnTon(n3,st,ed,size,psize);
+
+		   //if path is not detected,ignore
        		   if(hz==-1.0){
-		           myclone(n,n3);	      //初期化
-		       continue;
+		           myclone(n,n3);	      //initialize
+		           continue;
 		   }
 	      	   test=new Hasroute(d[ed],Route(ed),d,psize);
-		       if(a.contains(test)||b.contains(test)){//重複を除く
-		              myclone(n,n3);	      //初期化
+		       if(a.contains(test)||b.contains(test)){//重複を除く except duplicate path
+		           myclone(n,n3);	      //initialize
 			   continue;
-		       }
-		   b.add(test);
-		   myclone(n,n3);	      //初期化
+		       } 
+		   b.add(test);// candicate path add to b
+		   myclone(n,n3);	      //initialize
 		}
+		
+		//if candicate path nothing, finish the detect.
 		if(b.size()==0){
-		    Collections.sort(a);//辞書順に小さい文字を優先させるため
-		    //		    System.out.println(a.size());
+		    Collections.sort(a);//辞書順に小さい文字を優先させるため Priority is given to the small characters in the dictionary order
+
+		    //convert ArrayList to array.
 		    for(int x=1;x<=a.size();x++){
 			ret[x]=a.get(x-1).getdis();
 		    }
 		    return ret;
 		}
+		
+		//Sort candicate path
 		Collections.sort(b);
-		a.add(b.get(0));//最短を確定へ
+		
+		a.add(b.get(0));//最短を確定へ move shortest path in b to a
 		b.remove(0);
 		delroute(a.get(a.size()-1));
 	    }
 	}
-	Collections.sort(a);//辞書順に小さい文字を優先させるため
+	Collections.sort(a);//辞書順に小さい文字を優先させるため Priority is given to the small characters in the dictionary order
 	for(int x=1;x<=a.size();x++){
 	    ret[x]=a.get(x-1).getdis();
 	    }
 	return ret;
     }
     void myclone(/*double[][] n,double[][]opo*/ ArrayList<AdjacencyList> n,AdjacencyList[]opo){
-	/*	for(int i=0;i<=size;i++){
-	    for(int j = 0;j<=size;j++){
-	        opo[i][j]=n[i][j];
-	    }
-	    }*/
 	for(int i=1;i<=size;i++){
 	    opo[i]=new AdjacencyList();
 	    for(Entry<Integer,Double>entry: /*n[i].entrySet()*/n.get(i).entrySet()){
@@ -128,6 +130,8 @@ class Dijkstra{ //referenced to p305 algorithms
 	    }
 	}	
     }
+
+    //search delete index of route along route "a" 
     void delroute(Hasroute a){
 	int[]route= a.getroute();
 	int[]sep_route;
@@ -136,7 +140,11 @@ class Dijkstra{ //referenced to p305 algorithms
 	for(int i =1;i<a.getsize();i++){
 	    flg=false;
 	    sep_route=new int[i+1];
+
+	    //get the route 0 to i+1(ex (Original[Hasroute])A-D-C-B (1)A (2)A-D (3)A-D-C (4)A-D-C-B )
        	    System.arraycopy(route,0,sep_route,0,i+1);
+	    
+	    //if "i" is end,put the flag 
 	    if(i==a.getsize()-1){
 		delr=new Hasroute(0.0,sep_route,new double[]{0.0});
 	    }else{
@@ -156,6 +164,8 @@ class Dijkstra{ //referenced to p305 algorithms
 	}
 	return;
     }
+
+    //Simple dijkstra: One query can use one time only.
     double nTon(AdjacencyList[]n,int st,int ed,int size,int psize){
 	color=new int[size+1];
 	d=new double[size+1];
@@ -172,12 +182,6 @@ class Dijkstra{ //referenced to p305 algorithms
 	for(int i=1;i<=size;i++){
 	    d[i]=INF;
 	    color[i]=w;
-	    /*Adjacency list does not need to INF
-	    for(int j=1;j<=size;j++){
-		if(!(n[i][j]>0.0)){
-		    n[i][j]=INF;
-		}
-	    }*/
 	}
 	d[st]=0;
 	p[st]=-1;
@@ -185,10 +189,12 @@ class Dijkstra{ //referenced to p305 algorithms
 	node = nodes.poll();
         while(node!=null){
 	    color[node.getNode()]=b;
+	    //if smaller than d[],program ignore
 	    if(d[node.getNode()]<node.getDis()){
 		node=nodes.poll();
 		continue;
 	    }
+	    //obtain by small distance order
 	    for(int entry:n[node.getNode()].keySet()){	    
 	       if(color[entry]!=b &&n[node.getNode()].containsKey(entry)){
 		   disn=n[node.getNode()].get(entry);//n[u][v]
@@ -205,28 +211,24 @@ class Dijkstra{ //referenced to p305 algorithms
 	if(d[ed]==INF)return -1.0;
 	return d[ed];
     }
+
+    //Dijkstra with delete route by delroute. already seted the parameter in halfway by preSpur.
     double spurnTon(AdjacencyList[]n,int st,int ed,int size,int psize){
 	double hz,disn;
 	int u,v;
 	double mincost;
 	Node node;
-	/* Adjacency list does not need to INF
-	for(int i=1;i<=size;i++){
-	    for(int j=1;j<=size;j++){
-		if(!(n[i][j]>0.0)){
-		    n[i][j]=INF;
-		}
-	    }
-	    }*/
 	node=null;
 	node = nodes.poll();
         while(node!=null){
 	    color[node.getNode()]=b;
+ 	    //if smaller than d[],program ignore
 	    if(d[node.getNode()]<node.getDis()){
 		node=null;
 		node=nodes.poll();
 		continue;
 	    }
+	    //obtain by small distance order
 	    for(int entry:n[node.getNode()].keySet()){	
 	       if(color[entry]!=b &&n[node.getNode()].containsKey(entry)){
 		   disn=n[node.getNode()].get(entry);//n[u][v]
@@ -243,8 +245,10 @@ class Dijkstra{ //referenced to p305 algorithms
 	if(d[ed]==INF)return -1.0;
 	return d[ed];
 }
+    //preSpur can initialize in delete version Dijkstra,making d and p and color halfway
     public void preSpur(Hasroute h,int ind){
 	int i;
+	//Initialize parameter
 	for(i=0;i<=size ; i++){
 	    d[i]=INF;
 	    color[i]=w;
@@ -252,19 +256,21 @@ class Dijkstra{ //referenced to p305 algorithms
 	}
 	int[] ro=h.getroute();
 	double[] adis=h.getarraydis();
+	//Restore parameter from old route.
 	for(i = 1 ;i<ind;i++){
 	    color[ro[i]]=b;
 	    p[ro[i]]=ro[i-1];
 	    d[ro[i]]=adis[ro[i]];
 	    if(ro[i]==ed)break;
 	}
+	//choose the start node
 	 color[ro[i]]=g;
 	 p[ro[i]]=ro[i-1];
 	 d[ro[i]]=adis[ro[i]];
     	 nodes.add(new Node(ro[i],d[ro[i]]));
     }
 
-    
+    //rep_NumtoS converts numbers to including "C" numbers, and output the route. 
     public String rep_NumtoS(int d,boolean bla,int na,int nc){
 	String s1,s2="";
 	if(bla)s2=" ";
@@ -276,6 +282,8 @@ class Dijkstra{ //referenced to p305 algorithms
 	}
 	return s2+s1;
     }
+    
+    //RouteSntimes invoke rep_NumtoS and read i-th shortest path .
     public String RouteSntimes(int p,int na,int nc){
 	       String c="";
 	       int[] myroute=(a.get(p-1)).getroute();
@@ -288,6 +296,7 @@ class Dijkstra{ //referenced to p305 algorithms
 	       }
 	       return c;
 	    }
+   //Using by Hasroute,to make route r[] from p[]
    public int[] Route(int ed){
        ArrayList<Integer> list= new ArrayList<Integer>();
 	int i,po;
@@ -306,9 +315,7 @@ class Dijkstra{ //referenced to p305 algorithms
 	}   
 	return r;  
    }
-   public int[] retRoute(){
-	return Route(this.ed);
-    }
+    //Return path by String
     public String retRouteS(int p,int na,int nc){
 	return RouteSntimes(p,na,nc);
     }
