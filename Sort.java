@@ -8,7 +8,7 @@ public class Sort{
 	    for(i=1;i <= cnt;i++){
 		j=i;
 		hzp=p[i];
-		while(j >= sub){
+		while(j >= sub+1){
 		    if(p[j-sub].getX()<hzp.getX() ||
 		       p[j-sub].getX()==hzp.getX() &&
 		       p[j-sub].getY()<hzp.getY()) break;//交換する条件(p[j-sub]と対象hzpを比べる)
@@ -17,7 +17,13 @@ public class Sort{
 		}
 		p[j]=hzp;
 	    }
-	    sub/=2;//距離を縮める
+	    if(sub/2!=0){
+		sub/=2;//距離を縮める
+	    }else if(sub==1){
+		sub = 0;
+	    }else{
+		sub = 1;
+	    }
 	}
 	return p;
     }
