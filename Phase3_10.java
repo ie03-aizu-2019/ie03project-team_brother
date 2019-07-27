@@ -68,6 +68,7 @@ class Phase3_10{
     public static void InputData(){
 	Scanner sc = new Scanner(System.in);
 	
+	System.err.println("Please input N, M, P and Q.");
 	N=sc.nextInt();
        	M=sc.nextInt();
 	P=sc.nextInt();
@@ -81,27 +82,120 @@ class Phase3_10{
 	k = new int[Q+1];
 
 	// N info
+
+	if(N>0)
+	    System.err.println("Please input Point info (x and y coordinate)");
 	for(int i=1; i<=N; i++){
 	    p[i]=new Point(sc.nextInt(),sc.nextInt());
+	    
+	    if((p[i].getX() < 0 || p[i].getX() > 1000000) ||
+	       (p[i].getY() < 0 || p[i].getY() > 1000000)){
+		System.err.println("X and Y should be between 0 and 1,000,000.");
+		System.err.println("Please input again.");
+		i--;
+		continue;
+	    }
+
+	    boolean hasflag = false;
+
+	    for(int j=1; j<i; j++){
+		if(hasflag = HasAlready(p[i], p[j])){
+		    break;
+		}
+	    }
+
+	    if(hasflag){
+		System.err.println("Point shouldn't duplicate.");
+		System.err.println("Please input again.");
+		i--;
+		continue;
+	    }
+
 	    p[i].setID(i);
 	}
 
 	// M info
+	if(M>0)
+	    System.err.println("Please input Line info (start and end point)");
 	for(int i=1; i<=M; i++){
-	    l[i]=new Line(p[sc.nextInt()],p[sc.nextInt()]);
+	    int st, ed;
+
+	    st = sc.nextInt();
+	    ed = sc.nextInt();
+
+	    if((st < 0 || st > p.length) ||
+	       (ed < 0 || ed > p.length)){
+		System.err.println("The start and end point should be between 0 and "+p.length+".");
+		System.err.println("Please input again.");
+		i--;
+		continue;
+	    }
+	    
+	    l[i]=new Line(p[st],p[ed]);
+
+	    boolean hasflag = false;
+
+	    for(int j=1; j<i; j++){
+		if(hasflag = (HasAlready(l[i].getStart(), l[j].getStart())
+			      && HasAlready(l[i].getEnd(), l[j].getEnd()))){
+		    break;
+		}
+	    }
+
+	    if(hasflag){
+		System.err.println("Line shouldn't duplicate.");
+		System.err.println("Please input again.");
+		i--;
+		continue;
+	    }
 	}
 
 	// P info
+	if(P>0)
+	    System.err.println("Please input Additional Point info (x and y coordinate)");
 	for(int i=1; i<=P; i++){
 	    ad[i]=new Point(sc.nextInt(),sc.nextInt());
+	    
+	    if((ad[i].getX() < 0 || ad[i].getX() > 1000000) ||
+	       (ad[i].getY() < 0 || ad[i].getY() > 1000000)){
+		System.err.println("X and Y should be between 0 and 1,000,000.");
+		System.err.println("Please input again.");
+		i--;
+		continue;
+	    }
+
+	    boolean hasflag = false;
+
+	    for(int j=1; j<i; j++){
+		if(hasflag = HasAlready(ad[i], ad[j])){
+		    break;
+		}
+	    }
+
+	    if(hasflag){
+		System.err.println("Point shouldn't duplicate.");
+		System.err.println("Please input again.");
+		i--;
+		continue;
+	    }
+	    
 	    ad[i].setID(i);
 	}
 
 	// Q info
+	if(Q>0)
+	    System.err.println("Please input Route info (start, end, and k-th)");
 	for(int i=1; i<=Q; i++){
 	    s[i] = sc.next();
 	    d[i] = sc.next();
 	    k[i] = sc.nextInt();
+
+	    if(k[i]<=0){
+		System.err.println("k should be at least 1.");
+		System.err.println("Please input again.");
+		i--;
+		continue;
+	    }
 	}
     }
 
@@ -141,7 +235,7 @@ class Phase3_10{
 		    // If Ip doesn't have same point, insert this point
 		    if(hasflag!=1){
 			Ip.add(ans);
-			System.out.println("C"+Ip.size()+
+			System.out.println("C"+(Ip.size()-1)+
 					   ": ("+Ip.get(Ip.size()-1).getX()+
 					   ", "+Ip.get(Ip.size()-1).getY()+")");
 		    }

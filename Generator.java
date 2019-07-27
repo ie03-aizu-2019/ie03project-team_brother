@@ -130,21 +130,11 @@ class Generator{
 
     private static void init(int task){
 	Scanner sc = new Scanner(System.in);
-
-	if(task==10){
-	    int num = rnd.nextInt(200000 - 2) + 2;
-	    N = new Range(num + num%2);
-	    M = new Range(rnd.nextInt(N.getValue()/2) + 1);
-	    P = new Range(rnd.nextInt(1000+1));
-	    Q = new Range(rnd.nextInt(1000+1));
-	}
 	
-	else{
-	    N = new Range(sc.nextInt());
-	    M = new Range(sc.nextInt());
-	    P = new Range(sc.nextInt());
-	    Q = new Range(sc.nextInt());
-	}
+	N = new Range(sc.nextInt());
+	M = new Range(sc.nextInt());
+	P = new Range(sc.nextInt());
+	Q = new Range(sc.nextInt());
 	
 	ranges(task);
     }
@@ -205,7 +195,7 @@ class Generator{
 	case 10:
 	case 11:
 	    N.setRange(2,200000);
-	    M.setRange(1,100000);
+	    M.setRange(1,N.getValue()/2);
 	    P.setRange(0,1000);
 	    Q.setRange(0,1000);
 	    XYmax = 1000000;
@@ -236,14 +226,13 @@ class Generator{
 	return C/dev;
     }
 
-    /*
     private static int Intersection(ArrayList<Pair> pts, ArrayList<Pair> lns){
 	int count=0;
 	Point ans;
 	Intersection it = new Intersection();
 	
 	for(int i=0; i<lns.size(); i++){
-	    for(int j=i; j<lns.size(); j++){
+	    for(int j=i+1; j<lns.size(); j++){
 		ans = it.calc(PairToLine(ln.get(i), pts), PairToLine(ln.get(j), pts));
 
 		if(ans.getX()>=0 || ans.getY()>=0){
@@ -254,7 +243,6 @@ class Generator{
 	
 	return count;
     }
-    */
 
     public static Line PairToLine(Pair l, ArrayList<Pair> p){
 	Point start = new Point(p.get(l.get1()-1).get1(), p.get(l.get1()-1).get2());
@@ -263,7 +251,7 @@ class Generator{
 	return new Line(start, end);
     }
     
-    private static void setRandom(int task){
+    private static int setRandom(int task){
 
 	if(task==10)
 	    setNM_for10();
@@ -313,6 +301,9 @@ class Generator{
 	    }
 	}
 
+	if(Intersection(pt, ln)>=100000)
+	    return -1;
+
 	// P
 	for(int i=0; i<P.getValue(); i++){
 	    pin.add(new Pair(rnd.nextInt(XYmax+1), rnd.nextInt(XYmax+1)));
@@ -356,7 +347,8 @@ class Generator{
 		}
 	    }
 	}
-	
+
+	return 1;
     }
 
     private static void setNM_for10(){
@@ -466,8 +458,12 @@ class Generator{
 	
 	// generate data
 	// check data is correct
-	setRandom(Integer.parseInt(args[0]));
 	// if not, generate once more(loop)
+	while(setRandom(Integer.parseInt(args[0])) == -1){
+	    pt.clear();
+	    ln.clear();
+	    System.err.println("Re generate");
+	}
 
 	// if correct, output data
 	output();
