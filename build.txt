@@ -1,2 +1,11 @@
-javac Main.java
-java Main
+[Main]
+compile:        javac Main.java
+execution:      java Main
+
+use test data:  java Main < [file name(.txt file)]
+
+[Generator]
+compile:        javac Generator.java
+execution:      java Generator [task number(1~11)]
+
+make test data: java Generator [task number(1~11)] > [file name(.txt file)]
